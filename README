@@ -1,0 +1,22 @@
+INSTALLATION
+
+To compile and run devilish, enter:
+
+    make clean
+    make
+    ./devilish
+
+If for any reason the makefile doesn't work as expected, manual compilation can be done with:
+
+    gcc -o devilish devilish.c
+
+devilish is tested to be compatible with the c89, c99, c11, gnu89, gnu99, and gnu11 standards, and is tested to work with gcc versions 4.8.5 to 8.1.0.
+
+---------------------------
+---------------------------
+
+UNINSTALLATION
+
+To remove all devilish files (including this README and the makefile), run:
+
+    make uninstall
