@@ -7,6 +7,7 @@ project=devilish
 production=/var/www/pkgs/$project
 src=/var/www/pkgs/$project/src
 
+pwd
 #tar -zcvf $project.tar.gz $project
 git archive --format=tar -v -o $project.tar.gz HEAD
 #zip -r $project.zip $project
