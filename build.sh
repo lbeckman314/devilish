@@ -7,6 +7,7 @@ project=devilish
 production=/var/www/pkgs/$project/src
 
 cd ..
+pwd
 tar -zcvf $project.tar.gz $project
 zip -r $project.zip $project
 sha256sum *.tar.gz *.zip > sha256sums.txt
