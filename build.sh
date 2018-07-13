@@ -4,7 +4,7 @@
 set +x
 
 project=devilish
-production=/var/www/pkgs/$project/src
+production=/var/www/pkgs/$project
 
 cd ..
 pwd
