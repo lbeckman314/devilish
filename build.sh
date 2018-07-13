@@ -15,5 +15,5 @@ sha256sum *.tar.gz *.zip > sha256sums.txt
 gpg --pinentry-mode loopback --passphrase $gpgpass --batch --yes --detach-sign -a sha256sums.txt
 
 mv $project.tar.gz $project.zip sha256sums.txt* $production
-cd src
+cd $src
 git pull
