@@ -4,9 +4,9 @@ This is a minimalistic shell. It comes from the depths of hell, and can do lots 
 
 ---
 
-* Installation
+# Installation
 
-0. Prerequisites
+## Prerequisites
 
 gcc :: for compiling the shell.
 
@@ -16,7 +16,7 @@ If you are running Windows, the above utilities will be packaged in any of the f
 
 The above utilities should be installed (or readily available) if you are running a Unix derivative (such as Linux, macOS, or any of the BSD’s).
 
-1. Quickstart
+## Quickstart
 
 ```sh
 # clone the git repo
@@ -38,9 +38,9 @@ make
 
 ---
 
-* Uninstallation
+# Uninstallation
 
-0. Delete the directory/folder.
+##  Delete the directory/folder.
 
 ```sh
 rm -rfI devilish
@@ -48,7 +48,7 @@ rm -rfI devilish
 
 ---
 
-* Documentation
+# Documentation
 
 You will be provided with a prompt (:), from which you can do all sorts of shell magic!
 
