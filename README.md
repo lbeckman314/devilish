@@ -1,6 +1,6 @@
 [![Build Status](https://liambeckman.com/jenkins/job/devilish/badge/icon)](https://liambeckman.com/jenkins/job/devilish/)
 
-This is a minimalistic shell — It comes from the depths of hell, and can do lots of cool things!
+This is a minimalistic shell. It comes from the depths of hell, and can do lots of cool things!
 
 ---
 
