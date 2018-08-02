@@ -605,12 +605,12 @@ Looking for it everywhere I want to make sure
 it will get me completely.
 
 The sea-bed attracts me, and
-I’m repelled by millions
+I'm repelled by millions
 of sea shells that all look alike.
 Help, I am one of them.
 If only I knew, which.
 
-How often I’ve gone straight up
+How often I've gone straight up
 to one of them, saying: That’s me.
 Only, when I prised it open
 it was empty.
