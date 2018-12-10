@@ -3,14 +3,20 @@
 var WebSocket = require('ws')
 const readline = require('readline');
 
+console.log("Connecting to server...");
+
+process.env["NODE_TLS_REJECT_UNAUTHORIZED"] = 0;
 
 // Create WebSocket connection.
-const socket = new WebSocket('ws://localhost:8080');
+const socket = new WebSocket('wss://192.168.0.15:8181');
+
+console.log("Success!");
 
 
 // Connection opened
 socket.onopen = function (event) {
 	//command = readline.question(": ");
+	console.log("Sending initial message to server.");
 	socket.send("");
 }
 

@@ -3,11 +3,14 @@ const https = require('https');
 const WebSocket = require('ws');
 
 const server = new https.createServer({
-  cert: fs.readFileSync('/path/to/cert.pem'),
-  key: fs.readFileSync('/path/to/key.pem')
+  cert: fs.readFileSync('./cert.pem'),
+  key: fs.readFileSync('./key.pem'),
+  passphrase: '284846'
 });
 
 const wss = new WebSocket.Server({ server });
+
+console.log("Waiting for clients...");
 
 wss.on('connection', function connection(ws) {
 
@@ -59,4 +62,4 @@ wss.on('connection', function connection(ws) {
 
 });
 
-server.listen(8080);
+server.listen(8181);
