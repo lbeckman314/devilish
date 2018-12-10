@@ -1,0 +1,128 @@
+<h2>src</h2>
+<p>⇢ the address that the program may be download at</p>
+<br />
+<br />
+
+<form action="/insert" method="get">
+<fieldset>
+  <legend>add new src</legend>
+    <label>
+        <span class="name">url</span>
+        <span> ⇢ </span>
+        <input size="20" name="url" placeholder="git.coolbot.com" id="url" type="text_input">
+    </label>
+    <label>
+      <span class="name">type</span>
+      <span> ⇢ </span>
+      <input size="20" name="type" placeholder="git" id="type" type="text_input">
+    </label>
+    <label id="program">
+        <span class="name">program</span>
+        <span> ⇢ </span>
+        <select id="pid"> 
+            {{#each program}}
+                <option value="{{id}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<table>
+  <tr> 
+    <th>url</th>
+    <th>type</th> 
+    <th>program</th> 
+  </tr> 
+  {{#each src}} 
+  <tr> 
+    <td><a href="{{url}}">{{url}}</a></td> 
+    <td>{{type}}</td> 
+    <td>{{name}}</td> 
+    <td>
+    <form action="/edit-src" method="get">
+    <input value="Edit" class="buttonEdit" type="submit">
+    <input name="id" value={{id}} class="hidden" type="hidden">
+    </form>
+    <form action="/delete" method="get">
+    <input value="Delete" class="buttonDelete" type="submit">
+    <input name="id" value={{id}} class="hidden-table" type="hidden"></form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+
+
+<script>
+
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+    let buttonHidden = document.getElementById("id");
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+            let userurl = document.getElementById("url").value;
+            let userType = document.getElementById("type").value;
+            let userPid = document.getElementById("pid").value;
+console.log("userPid: ", userPid);
+            //req.open('GET', '/safe-update' + '?table=' + 'src' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            req.open('GET', '/insert' + '?table=' + 'src' + "&url=" + userurl + "&type=" + userType + "&pid=" + userPid, true);
+            console.log('/insert' + '?table=' + 'src' + "&url=" + userurl + "&type=" + userType + "&pid=" + userPid + "");
+
+            event.preventDefault();
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/{{table}}';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+        // hidden row id
+        let buttonsHidden = document.getElementsByClassName("hidden");
+
+        let buttonsDelete = document.getElementsByClassName("buttonDelete");
+
+console.log("length: " , buttonsDelete.length);
+        for (let i = 0; i < buttonsDelete.length; i++) {
+        console.log(buttonsHidden[i]);
+        console.log("abc");
+        buttonsDelete[i].addEventListener('click', function(event){;
+            console.log("adding ev to delete button");
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+
+            console.log("/delete?table={{table}}&id=" + buttonsHidden[i].value);
+            req.open('GET', '/delete?table={{table}}&id=' + buttonsHidden[i].value, true);
+
+            req.onload = function() {
+                let res = req.responseText;
+                location.reload();
+            }
+
+            req.send(null);
+        });
+        };
+}
+            
+</script>
+
+<!--<script src="tabler.js"></script>-->
+
+

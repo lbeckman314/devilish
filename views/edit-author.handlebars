@@ -1,0 +1,94 @@
+<div id="add">
+</div>
+
+<div id="form">
+</div>
+
+<div id="table">
+</div>
+
+<pre id="results">{{results}}</pre>
+
+
+
+<form id="formOld" action="/safe-update" method="get">
+<fieldset>
+<legend>edit</legend>
+  {{#each author}} 
+<input name="table" value={{table}} class="hidden-table" type="hidden">
+<div id="input">
+<label>
+<span class="name" style="width: 65px;">name</span>
+<span> ⇢ </span>
+<input size="20" name="name" id="name" type="text_input" value="{{name}}">
+</label>
+<label>
+<span class="name" style="width: 65px;">url</span>
+<span> ⇢ </span>
+<input size="20" name="url" id="url" type="text_input" value={{url}}>
+</label>
+<input id="table" name="table" value={{table}} class="hidden-table" type="hidden">
+<input id="id" name="id" value={{id}} class="hidden" type="hidden">
+<input class="submit" value="Submit" id="submit" type="submit">
+  {{/each}} 
+</fieldset>
+</form>
+
+<h2>{{table}}</h2>
+  {{#each author}} 
+<table>
+  <tr> 
+    <th>name</th> 
+    <th>url</th>
+  </tr> 
+  <tr> 
+        <td>{{name}}</td> 
+        <td><a href="{{url}}">{{url}}</a></td> 
+  </tr> 
+    </form>
+    </td>
+  {{/each}} 
+</table> 
+
+<script>
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+    let buttonHidden = document.getElementById("id");
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+            let userName = document.getElementById("name").value;
+            let userurl = document.getElementById("url").value;
+            req.open('GET', '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            console.log( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            console.log( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            req.open('GET', '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+            //req.open( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            event.preventDefault();
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/{{table}}';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+}
+</script>
+
+

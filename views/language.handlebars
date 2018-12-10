@@ -1,0 +1,116 @@
+<h2>language</h2>
+<p>⇢ the languages the program is written in</p>
+<br />
+<br />
+
+<form action="/insert" method="get">
+<fieldset>
+  <legend>add new language</legend>
+    <label>
+      <span class="name">name</span>
+      <span> ⇢ </span>
+      <input size="20" name="name" placeholder="coollang" id="name" type="text_input">
+    </label>
+    <label>
+        <span class="name">url</span>
+        <span> ⇢ </span>
+        <input size="20" name="url" placeholder="www.coollang.com" id="url" type="text_input">
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<table>
+  <tr> 
+    <th>name</th> 
+    <th>url</th>
+  </tr> 
+  {{#each language}} 
+  <tr> 
+    <td>{{name}}</td> 
+    <td><a href="{{url}}">{{url}}</a></td> 
+    <td>
+    <form action="/edit-language" method="get">
+    <input value="Edit" class="buttonEdit" type="submit">
+    <input name="id" value={{id}} class="hidden" type="hidden">
+    </form>
+    <form action="/delete" method="get">
+    <input value="Delete" class="buttonDelete" type="submit">
+    <input name="id" value={{id}} class="hidden-table" type="hidden"></form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+
+
+<script>
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            //console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+            let userName = document.getElementById("name").value;
+            //console.log("@@ userName:", userName);
+
+            
+            let userurl = document.getElementById("url").value;
+
+            //console.log('/insert?name=' + userName + "&purpose=" + userpurpose + "&version=" + userversion + "&license=" + userlicense + "&retrieved=" + userretrieved);
+            req.open('GET', '/insert?table=language&name= ' + userName + "&url=" + userurl, true);
+            req.onload = function() {
+                let res = req.responseText;
+                //update();
+                location.reload();
+            }
+
+            event.preventDefault();
+            req.send(null);
+
+            
+        });
+    }
+
+        // hidden row id
+        let buttonsHidden = document.getElementsByClassName("hidden");
+
+
+        let buttonsDelete = document.getElementsByClassName("buttonDelete");
+
+console.log("length: " , buttonsDelete.length);
+        for (let i = 0; i < buttonsDelete.length; i++) {
+        console.log(buttonsHidden[i]);
+        console.log("abc");
+        buttonsDelete[i].addEventListener('click', function(event){;
+            console.log("adding ev to delete button");
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+
+            console.log("/delete?table={{table}}&id=" + buttonsHidden[i].value);
+            req.open('GET', '/delete?table={{table}}&id=' + buttonsHidden[i].value, true);
+
+            req.onload = function() {
+                let res = req.responseText;
+                location.reload();
+            }
+
+            req.send(null);
+        });
+        };
+}
+
+
+            
+</script>
+
+<!--<script src="tabler.js"></script>-->
+
+

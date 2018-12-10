@@ -1,0 +1,124 @@
+<div id="add">
+</div>
+
+<div id="form">
+</div>
+
+<div id="table">
+</div>
+
+<pre id="results">{{results}}</pre>
+
+
+
+<form id="formOld" action="/safe-update" method="get">
+<fieldset>
+<legend>edit</legend>
+  {{#each program}} 
+<input name="table" value={{table}} class="hidden-table" type="hidden">
+<div id="input">
+<label>
+<span class="name" style="width: 65px;">name</span>
+<span> ⇢ </span>
+<input size="20" name="name" id="name" type="text_input" value="{{name}}">
+</label>
+
+
+<label>
+<span class="purpose" style="width: 65px;">purpose</span>
+<span> ⇢ </span>
+<input size="20" name="purpose" id="purpose" type="text_input" value="{{purpose}}">
+</label>
+
+
+<label>
+<span class="name" style="width: 65px;">url</span>
+<span> ⇢ </span>
+<input size="20" name="url" id="url" type="text_input" value={{url}}>
+</label>
+
+<label>
+<span class="version" style="width: 65px;">version</span>
+<span> ⇢ </span>
+<input size="20" name="version" id="version" type="text_input" value="{{version}}">
+</label>
+
+
+<label>
+<span class="license" style="width: 65px;">license</span>
+<span> ⇢ </span>
+<input size="20" name="license" id="license" type="text_input" value="{{license}}">
+</label>
+
+
+<input id="table" name="table" value={{table}} class="hidden-table" type="hidden">
+<input id="id" name="id" value={{id}} class="hidden" type="hidden">
+<input class="submit" value="Submit" id="submit" type="submit">
+  {{/each}} 
+</fieldset>
+</form>
+
+<h2>{{table}}</h2>
+  {{#each program}} 
+<table>
+  <tr> 
+    <th>name</th> 
+    <th>purpose</th>
+    <th>url</th>
+    <th>version</th>
+    <th>license</th>
+  </tr> 
+  <tr> 
+        <td>{{name}}</td> 
+        <td>{{purpose}}</td> 
+        <td><a href="{{url}}">{{url}}</a></td> 
+        <td>{{version}}</td> 
+        <td>{{license}}</td> 
+  </tr> 
+    </form>
+    </td>
+  {{/each}} 
+</table> 
+
+<script>
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+    let buttonHidden = document.getElementById("id");
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+            let userName = document.getElementById("name").value;
+            let userPurpose = document.getElementById("purpose").value;
+            let userurl = document.getElementById("url").value;
+            let userVersion = document.getElementById("version").value;
+            let userLicense = document.getElementById("license").value;
+
+
+            req.open('GET', '/safe-update' + '?table=' + 'program' + '&id=' + buttonHidden.value + '&name=' + userName + "&purpose=" + userPurpose + "&url=" + userurl + "&version=" + userVersion + "&license=" + userLicense, true);
+
+            event.preventDefault();
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/{{table}}';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+}
+</script>
+
+

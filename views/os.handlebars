@@ -1,0 +1,116 @@
+<h2>os</h2>
+<p>⇢ the operating systems the progam can run on</p>
+<br />
+<br />
+
+<form action="/insert" method="get">
+<fieldset>
+  <legend>add new os</legend>
+    <label>
+      <span class="name">name</span>
+      <span> ⇢ </span>
+      <input size="20" name="name" placeholder="coolOS" id="name" type="text_input">
+    </label>
+    <label>
+        <span class="name">url</span>
+        <span> ⇢ </span>
+        <input size="20" name="url" placeholder="www.coolos.com" id="url" type="text_input">
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<table>
+  <tr> 
+    <th>name</th> 
+    <th>url</th>
+  </tr> 
+  {{#each os}} 
+  <tr> 
+    <td>{{name}}</td> 
+    <td><a href="{{url}}">{{url}}</a></td> 
+    <td>
+    <form action="/edit-os" method="get">
+    <input value="Edit" class="buttonEdit" type="submit">
+    <input name="id" value={{id}} class="hidden" type="hidden">
+    </form>
+    <form action="/delete" method="get">
+    <input value="Delete" class="buttonDelete" type="submit">
+    <input name="id" value={{program.id}} class="hidden-table" type="hidden"></form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+<script>
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            //console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+            let userName = document.getElementById("name").value;
+            //console.log("@@ userName:", userName);
+
+            let userurl = document.getElementById("url").value;
+            //console.log("@@ userpurpose:", userpurpose);
+            //let userretrieved = document.getElementById("retrieved").value;
+            //console.log("@@ userretrieved:", userretrieved);
+            //console.log('/insert?name=' + userName + "&purpose=" + userpurpose + "&version=" + userversion + "&license=" + userlicense + "&retrieved=" + userretrieved);
+            req.open('GET', '/insert?table=os&name= ' + userName + "&url=" + userurl, true);
+            req.onload = function() {
+                let res = req.responseText;
+                //update();
+                location.reload();
+            }
+
+            event.preventDefault();
+            req.send(null);
+
+            
+        });
+    }
+
+        // hidden row id
+        let buttonsHidden = document.getElementsByClassName("hidden");
+
+
+        let buttonsDelete = document.getElementsByClassName("buttonDelete");
+
+console.log("length: " , buttonsDelete.length);
+        for (let i = 0; i < buttonsDelete.length; i++) {
+        console.log(buttonsHidden[i]);
+        console.log("abc");
+        buttonsDelete[i].addEventListener('click', function(event){;
+            console.log("adding ev to delete button");
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+
+            console.log("/delete?table={{table}}&id=" + buttonsHidden[i].value);
+            req.open('GET', '/delete?table={{table}}&id=' + buttonsHidden[i].value, true);
+
+            req.onload = function() {
+                let res = req.responseText;
+                location.reload();
+            }
+
+            req.send(null);
+        });
+        };
+
+}
+
+
+            
+</script>
+
+
+
+

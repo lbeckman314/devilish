@@ -1,0 +1,133 @@
+<div id="add">
+</div>
+
+<div id="form">
+</div>
+
+<div id="table">
+</div>
+
+<pre id="results">{{results}}</pre>
+
+
+
+
+<form action="/safe-update" method="get">
+<fieldset>
+  <legend>edit</legend>
+    <label>
+      <span class="name">program</span>
+      <span> ⇢ </span>
+        <select id="pnameSelect" name="program"> 
+            {{#each program}}
+                <option id={{id}}  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <label>
+        <span class="name">language</span>
+        <span> ⇢ </span>
+        <select id="lnameSelect" name="program"> 
+            {{#each language}}
+                <option id={{id}} value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<h2>{{table}}</h2>
+  {{#each program_language}} 
+<table>
+  <tr> 
+    <th>program</th> 
+    <th>language</th>
+  </tr> 
+  <tr> 
+    <td id={{pid}} class="pname">{{pname}}</td> 
+    <td id={{lid}} class="lname">{{lname}}</td> 
+  </tr> 
+    </form>
+    </td>
+  {{/each}} 
+</table> 
+
+<script>
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+let pnames = document.getElementsByClassName("pname");
+let lnames = document.getElementsByClassName("lname");
+
+let pname = pnames[0];
+let lname = lnames[0];
+
+let pnameSelect = document.getElementById("pnameSelect");
+let lnameSelect = document.getElementById("lnameSelect");
+
+for (let i = 0; i < pnameSelect.length; i++) {
+    if (pnameSelect[i].value == pname.innerHTML) {
+        pnameSelect[i].selected = true;
+    }
+}
+
+for (let i = 0; i < lnameSelect.length; i++) {
+    if (lnameSelect[i].value == lname.innerHTML) {
+        lnameSelect[i].selected = true;
+    }
+}
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+        let hiddenPid = document.getElementsByClassName("hiddenpid");
+        let hiddenLid = document.getElementsByClassName("hiddenlid");
+        console.log("hiddenlid: ", hiddenLid);
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+            let pids = document.getElementsByClassName("pname");
+            let lids = document.getElementsByClassName("lname");
+
+            let pid = pids[0].id;
+            let lid = lids[0].id;
+
+
+            let pidnew = document.getElementById("pnameSelect").selectedOptions[0].id;
+            let lidnew = document.getElementById("lnameSelect").selectedOptions[0].id;
+            console.log("pid: ", pid);
+            console.log("lid: ", lid);
+
+            console.log("pidnew: ", pidnew);
+            console.log("lidnew: ", lidnew);
+            //req.open('GET', '/safe-update' + '?table=' + 'language' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            //console.log( '/safe-update' + '?table=' + 'language' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            //console.log( '/safe-update' + '?table=' + 'language' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            console.log( '/safe-update-pl' + '?table=' + 'program_language' + '&pid=' + pid + '&lid=' + lid + '&pidnew=' + pidnew + '&lidnew=' + lidnew);
+            req.open('GET', '/safe-update-pl' + '?table=' + 'program_language' + '&pid=' + pid + '&lid=' + lid + '&pidnew=' + pidnew + '&lidnew=' + lidnew, true);
+            //req.open( '/safe-update' + '?table=' + 'language' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            event.preventDefault();
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/program-language';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+}
+</script>
+
+

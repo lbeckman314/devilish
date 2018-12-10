@@ -1,0 +1,127 @@
+<h2>program_language</h2>
+<p>⇢ the relationships between languages and programs</p>
+<br />
+<br />
+
+<form action="/insert" method="get">
+<fieldset>
+  <legend>add new program-language relationship</legend>
+    <label>
+      <span class="name">program</span>
+      <span> ⇢ </span>
+        <select id="pname" name="program"> 
+            {{#each program}}
+                <option  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <label>
+        <span class="name">language</span>
+        <span> ⇢ </span>
+        <select id="lname" name="program"> 
+            {{#each language}}
+                <option  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<table>
+  <tr> 
+    <th>program</th> 
+    <th>language</th>
+  </tr> 
+  {{#each program_language}} 
+  <tr> 
+    <td>{{pname}}</td> 
+    <td>{{lname}}</td> 
+    <td>
+    <form action="/edit-program-language" method="get">
+    <input value="Edit" class="buttonEdit" type="submit">
+    <input name="pid" value={{pid}} type="hidden" class="hiddenpid">
+    <input name="lid" value={{lid}} type="hidden" class="hiddenlid">
+    </form>
+    <form action="/delete" method="get">
+    <input value="Delete" class="buttonDelete" type="submit">
+    <input name="table" value="program_language" class="hidden-table" type="hidden"></form>
+    </form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+
+
+<script>
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            //console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+            let userPname = document.getElementById("pname").value;
+            //console.log("@@ userName:", userName);
+
+            let userLname = document.getElementById("lname").value;
+            //console.log("@@ userpurpose:", userpurpose);
+
+            req.open('GET', '/insert?table=program_language&pname=' + userPname + "&lname=" + userLname, true);
+            req.onload = function() {
+                let res = req.responseText;
+                //update();
+                location.reload();
+            }
+
+            event.preventDefault();
+            req.send(null);
+
+            
+        });
+    }
+
+        // hidden row id
+        let hiddenPid = document.getElementsByClassName("hiddenpid");
+        let hiddenLid = document.getElementsByClassName("hiddenlid");
+        console.log("hiddenlid: ", hiddenLid);
+
+
+        let buttonsDelete = document.getElementsByClassName("buttonDelete");
+
+console.log("length: " , buttonsDelete.length);
+        for (let i = 0; i < buttonsDelete.length; i += 2) {
+        //console.log(buttonsHidden[i]);
+        console.log("abc");
+        buttonsDelete[i].addEventListener('click', function(event){;
+            console.log("adding ev to delete button");
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+
+            console.log("/delete?table={{table}}&pid=" + hiddenPid[i].value + "&lid=" + hiddenLid[i].value);
+            req.open('GET', '/delete?table={{table}}&pid=' + hiddenPid[i].value + "&lid=" + hiddenLid[i].value , true);
+
+            req.onload = function() {
+                let res = req.responseText;
+                location.reload();
+            }
+
+            req.send(null);
+        });
+        };
+}
+
+
+            
+</script>
+
+<!--<script src="tabler.js"></script>-->
+
+

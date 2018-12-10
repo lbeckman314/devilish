@@ -1,0 +1,184 @@
+<div id="add">
+</div>
+
+<div id="form">
+</div>
+
+<div id="table">
+</div>
+
+<pre id="results">{{results}}</pre>
+
+
+
+<form id="formOld" action="/safe-update" method="get">
+<fieldset>
+<legend>edit</legend>
+<input name="table" value={{table}} class="hidden" type="hidden">
+<div id="input">
+{{#each program}} 
+<label>
+<span class="name" style="width: 65px;">name</span>
+<span> ⇢ </span>
+<input size="20" name="name" id="name" type="text_input" value="{{name}}">
+</label>
+{{/if}}
+{{#if purpose}}
+<label>
+<span class="name" style="width: 65px;">purpose</span>
+<span> ⇢ </span>
+<input size="20" name="purpose" id="purpose" type="text_input" value={{purpose}}>
+</label>
+{{/if}}
+{{#if url}}
+<label>
+<span class="name" style="width: 65px;">url</span>
+<span> ⇢ </span>
+<input size="20" name="url" id="url" type="text_input" value={{url}}>
+</label>
+{{/if}}
+{{#if version}}
+<label>
+<span class="name" style="width: 65px;">version</span>
+<span> ⇢ </span>
+<input size="20" name="version" id="version" type="text_input" value={{version}}>
+</label>
+{{/if}}
+{{#if license}}
+<label>
+<span class="name" style="width: 65px;">license</span>
+<span> ⇢ </span>
+<input size="20" name="license" id="license" type="text_input" value={{license}}>
+</label>
+{{/if}}
+{{#if type}}
+<label>
+<span class="name" style="width: 65px;">type</span>
+<span> ⇢ </span>
+<input size="20" name="type" id="type" type="text_input" value={{type}}>
+</label>
+{{/if}}
+<input id="id" name="id" value={{id}} class="hidden" type="hidden">
+<input class="submit" value="Submit" id="submit" type="submit">
+</fieldset>
+</form>
+{{/each}}
+
+<h2>{{table}}</h2>
+<table>
+  {{#each program}} 
+  <tr> 
+    {{#if name}}
+        <th>name</th> 
+    {{/if}}
+    {{#if purpose}}
+        <th>purpose</th> 
+    {{/if}}
+    {{#if url}}
+        <th>url</th>
+    {{/if}}
+    {{#if version}}
+        <th>version</th>  
+    {{/if}}
+    {{#if license}}
+        <th>license</th>  
+    {{/if}}
+    {{#if type}}
+        <th>type</th>  
+    {{/if}}
+  </tr> 
+  {{/each}} 
+  {{#each program}} 
+  <tr> 
+    {{#if name}}
+        <td>{{name}}</td> 
+    {{/if}}
+    {{#if purpose}}
+        <td>{{purpose}}</td> 
+    {{/if}}
+    {{#if url }}
+        <td><a href="{{url}}">{{url}}</a></td> 
+    {{/if}}
+    {{#if version}}
+        <td>{{version}}</td>
+    {{/if}}
+    {{#if license}}
+        <td>{{license}}</td>
+    {{/if}}
+    {{#if type}}
+        <td>{{type}}</td>
+    {{/if}}
+    </form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+<script>
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+    let buttonHidden = document.getElementById("id");
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+        if ("{{table}}" == "program"){
+            let userName = document.getElementById("name").value;
+            let userpurpose = document.getElementById("purpose").value;
+            let userurl = document.getElementById("url").value;
+            let userversion = document.getElementById("version").value;
+            let userlicense = document.getElementById("license").value;
+            req.open('GET', '/safe-update' + '?table=' + 'program' + '&id=' + buttonHidden.value + 
+'&name=' + userName + "&purpose=" + userpurpose + "&url=" + userurl + "&version=" + userversion + "&license=" + userlicense, true);
+        }
+
+        else if ("{{table}}" == "author"){
+            let userName = document.getElementById("name").value;
+            let userurl = document.getElementById("url").value;
+            req.open('GET', '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            console.log( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+        }
+
+        else if ("{{table}}" == "language"){
+            let userName = document.getElementById("name").value;
+            let userurl = document.getElementById("url").value;
+            req.open('GET', '/safe-update' + '?table=' + 'language' + '&id=' + buttonHidden.value +  '&name=' + userName +"&url=" + userurl, true);
+        }
+
+        else if ("{{table}}" == "os"){
+            let userName = document.getElementById("name").value;
+            let userurl = document.getElementById("url").value;
+            req.open('GET', '/safe-update' + '?table=' + 'os' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+        }
+
+        else if ("{{table}}" == "src"){
+            let userType = document.getElementById("type").value;
+            let userurl = document.getElementById("url").value;
+            req.open('GET', '/safe-update' + '?table=' + 'src' + '&id=' + buttonHidden.value +"&url=" + userurl + "&type=" + userType, true);
+        }
+
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/{{table}}';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+}
+</script>
+
+

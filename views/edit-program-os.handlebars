@@ -1,0 +1,133 @@
+<div id="add">
+</div>
+
+<div id="form">
+</div>
+
+<div id="table">
+</div>
+
+<pre id="results">{{results}}</pre>
+
+
+
+
+<form action="/safe-update" method="get">
+<fieldset>
+  <legend>edit</legend>
+    <label>
+      <span class="name">program</span>
+      <span> ⇢ </span>
+        <select id="pnameSelect" name="program"> 
+            {{#each program}}
+                <option id={{id}}  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <label>
+        <span class="name">os</span>
+        <span> ⇢ </span>
+        <select id="onameSelect" name="program"> 
+            {{#each os}}
+                <option id={{id}} value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<h2>{{table}}</h2>
+  {{#each program_os}} 
+<table>
+  <tr> 
+    <th>program</th> 
+    <th>os</th>
+  </tr> 
+  <tr> 
+    <td id={{pid}} class="pname">{{pname}}</td> 
+    <td id={{oid}} class="oname">{{oname}}</td> 
+  </tr> 
+    </form>
+    </td>
+  {{/each}} 
+</table> 
+
+<script>
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+let pnames = document.getElementsByClassName("pname");
+let onames = document.getElementsByClassName("oname");
+
+let pname = pnames[0];
+let oname = onames[0];
+
+let pnameSelect = document.getElementById("pnameSelect");
+let onameSelect = document.getElementById("onameSelect");
+
+for (let i = 0; i < pnameSelect.length; i++) {
+    if (pnameSelect[i].value == pname.innerHTML) {
+        pnameSelect[i].selected = true;
+    }
+}
+
+for (let i = 0; i < onameSelect.length; i++) {
+    if (onameSelect[i].value == oname.innerHTML) {
+        onameSelect[i].selected = true;
+    }
+}
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+        let hiddenPid = document.getElementsByClassName("hiddenpid");
+        let hiddenoid = document.getElementsByClassName("hiddenoid");
+        console.log("hiddenoid: ", hiddenoid);
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+            let pids = document.getElementsByClassName("pname");
+            let oids = document.getElementsByClassName("oname");
+
+            let pid = pids[0].id;
+            let oid = oids[0].id;
+
+
+            let pidnew = document.getElementById("pnameSelect").selectedOptions[0].id;
+            let oidnew = document.getElementById("onameSelect").selectedOptions[0].id;
+            console.log("pid: ", pid);
+            console.log("oid: ", oid);
+
+            console.log("pidnew: ", pidnew);
+            console.log("oidnew: ", oidnew);
+            //req.open('GET', '/safe-update' + '?table=' + 'os' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            //console.log( '/safe-update' + '?table=' + 'os' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            //console.log( '/safe-update' + '?table=' + 'os' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            console.log( '/safe-update-pa' + '?table=' + 'program_os' + '&pid=' + pid + '&oid=' + oid + '&pidnew=' + pidnew + '&oidnew=' + oidnew);
+            req.open('GET', '/safe-update-po' + '?table=' + 'program_os' + '&pid=' + pid + '&oid=' + oid + '&pidnew=' + pidnew + '&oidnew=' + oidnew, true);
+            //req.open( '/safe-update' + '?table=' + 'os' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            event.preventDefault();
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/program-os';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+}
+</script>
+
+

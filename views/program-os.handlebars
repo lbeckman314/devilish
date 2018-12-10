@@ -1,0 +1,126 @@
+<h2>program_os</h2>
+<p>⇢ the relationships between operating systems and programs</p>
+<br />
+<br />
+
+<form action="/insert" method="get">
+<fieldset>
+  <legend>add new program-os relationship</legend>
+    <label>
+      <span class="name">program</span>
+      <span> ⇢ </span>
+        <select id="pname" name="program"> 
+            {{#each program}}
+                <option  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <label>
+        <span class="name">os</span>
+        <span> ⇢ </span>
+        <select id="oname" name="program"> 
+            {{#each os}}
+                <option  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<table>
+  <tr> 
+    <th>program</th> 
+    <th>os</th>
+  </tr> 
+  {{#each program_os}} 
+  <tr> 
+    <td>{{pname}}</td> 
+    <td>{{oname}}</td> 
+    <td>
+    <form action="/edit-program-os" method="get">
+    <input value="Edit" class="buttonEdit" type="submit">
+    <input name="pid" value={{pid}} type="hidden" class="hiddenpid">
+    <input name="oid" value={{oid}} type="hidden" class="hiddenoid">
+    </form>
+    <form action="/delete" method="get">
+    <input value="Delete" class="buttonDelete" type="submit">
+    <input name="table" value="program_os" class="hidden-table" type="hidden"></form>
+    </form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+
+
+<script>
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            //console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+            let userPname = document.getElementById("pname").value;
+            //console.log("@@ userName:", userName);
+
+            let userOname = document.getElementById("oname").value;
+            //console.log("@@ userpurpose:", userpurpose);
+
+            req.open('GET', '/insert?table=program_os&pname=' + userPname + "&oname=" + userOname, true);
+            req.onload = function() {
+                let res = req.responseText;
+                //update();
+                location.reload();
+            }
+
+            event.preventDefault();
+            req.send(null);
+
+            
+        });
+    }
+
+        // hidden row id
+        let hiddenPid = document.getElementsByClassName("hiddenpid");
+        let hiddenOid = document.getElementsByClassName("hiddenoid");
+        console.log("hiddenoid: ", hiddenOid);
+
+
+        let buttonsDelete = document.getElementsByClassName("buttonDelete");
+
+console.log("length: " , buttonsDelete.length);
+        for (let i = 0; i < buttonsDelete.length; i++) {
+        console.log(buttonsDelete[i]);
+        buttonsDelete[i].addEventListener('click', function(event){;
+            console.log("adding ev to delete button");
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+
+            console.log("/delete?table={{table}}&pid=" + hiddenPid[i].value + "&oid=" + hiddenOid[i].value);
+            req.open('GET', '/delete?table={{table}}&pid=' + hiddenPid[i].value + "&oid=" + hiddenOid[i].value , true);
+
+            req.onload = function() {
+                let res = req.responseText;
+                location.reload();
+            }
+
+            req.send(null);
+        });
+        };
+}
+
+
+            
+</script>
+
+<!--<script src="tabler.js"></script>-->
+
+

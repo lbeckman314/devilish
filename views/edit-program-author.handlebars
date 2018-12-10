@@ -1,0 +1,133 @@
+<div id="add">
+</div>
+
+<div id="form">
+</div>
+
+<div id="table">
+</div>
+
+<pre id="results">{{results}}</pre>
+
+
+
+
+<form action="/safe-update" method="get">
+<fieldset>
+  <legend>edit</legend>
+    <label>
+      <span class="name">program</span>
+      <span> ⇢ </span>
+        <select id="pnameSelect" name="program"> 
+            {{#each program}}
+                <option id={{id}}  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <label>
+        <span class="name">author</span>
+        <span> ⇢ </span>
+        <select id="anameSelect" name="program"> 
+            {{#each author}}
+                <option id={{id}} value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<h2>{{table}}</h2>
+  {{#each program_author}} 
+<table>
+  <tr> 
+    <th>program</th> 
+    <th>author</th>
+  </tr> 
+  <tr> 
+    <td id={{pid}} class="pname">{{pname}}</td> 
+    <td id={{aid}} class="aname">{{aname}}</td> 
+  </tr> 
+    </form>
+    </td>
+  {{/each}} 
+</table> 
+
+<script>
+
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+let pnames = document.getElementsByClassName("pname");
+let anames = document.getElementsByClassName("aname");
+
+let pname = pnames[0];
+let aname = anames[0];
+
+let pnameSelect = document.getElementById("pnameSelect");
+let anameSelect = document.getElementById("anameSelect");
+
+for (let i = 0; i < pnameSelect.length; i++) {
+    if (pnameSelect[i].value == pname.innerHTML) {
+        pnameSelect[i].selected = true;
+    }
+}
+
+for (let i = 0; i < anameSelect.length; i++) {
+    if (anameSelect[i].value == aname.innerHTML) {
+        anameSelect[i].selected = true;
+    }
+}
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+        let hiddenPid = document.getElementsByClassName("hiddenpid");
+        let hiddenaid = document.getElementsByClassName("hiddenaid");
+        console.log("hiddenaid: ", hiddenaid);
+
+            console.log("adding ev to submit button");
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+
+            let pids = document.getElementsByClassName("pname");
+            let aids = document.getElementsByClassName("aname");
+
+            let pid = pids[0].id;
+            let aid = aids[0].id;
+
+
+            let pidnew = document.getElementById("pnameSelect").selectedOptions[0].id;
+            let aidnew = document.getElementById("anameSelect").selectedOptions[0].id;
+            console.log("pid: ", pid);
+            console.log("aid: ", aid);
+
+            console.log("pidnew: ", pidnew);
+            console.log("aidnew: ", aidnew);
+            //req.open('GET', '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            //console.log( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            //console.log( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl);
+            console.log( '/safe-update-pa' + '?table=' + 'program_author' + '&pid=' + pid + '&aid=' + aid + '&pidnew=' + pidnew + '&aidnew=' + aidnew);
+            req.open('GET', '/safe-update-pa' + '?table=' + 'program_author' + '&pid=' + pid + '&aid=' + aid + '&pidnew=' + pidnew + '&aidnew=' + aidnew, true);
+            //req.open( '/safe-update' + '?table=' + 'author' + '&id=' + buttonHidden.value + '&name=' + userName +"&url=" + userurl, true);
+
+            event.preventDefault();
+            req.onload = function() {
+                let res = req.responseText;
+                window.location.href = '/program-author';
+            }
+
+            req.send(null);
+
+            
+        });
+    }
+}
+</script>
+
+

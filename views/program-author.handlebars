@@ -1,0 +1,126 @@
+<h2>program_author</h2>
+<p>⇢ the relationships between authors and programs</p>
+<br />
+<br />
+
+<form action="/insert" method="get">
+<fieldset>
+  <legend>add new program-author relationship</legend>
+    <label>
+      <span class="name">program</span>
+      <span> ⇢ </span>
+        <select id="pname" name="program"> 
+            {{#each program}}
+                <option  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+    <label>
+        <span class="name">author</span>
+        <span> ⇢ </span>
+        <select id="aname" name="program"> 
+            {{#each author}}
+                <option  value="{{name}}">{{name}}</option>
+            {{/each}}
+        </select>
+    </label>
+  <input class="submit" value="Submit" type="submit">
+</fieldset>
+</form>
+
+<table>
+  <tr> 
+    <th>program</th> 
+    <th>author</th>
+  </tr> 
+  {{#each program_author}} 
+  <tr> 
+    <td>{{pname}}</td> 
+    <td>{{aname}}</td> 
+    <td>
+    <form action="/edit-program-author" method="get">
+    <input value="Edit" class="buttonEdit" type="submit">
+    <input name="pid" value={{pid}} type="hidden" class="hiddenpid">
+    <input name="aid" value={{aid}} type="hidden" class="hiddenaid">
+    </form>
+    <form action="/delete" method="get">
+    <input value="Delete" class="buttonDelete" type="submit">
+    <input name="table" value="program_author" class="hidden-table" type="hidden"></form>
+    </form>
+    </td>
+  </tr> 
+  {{/each}} 
+</table> 
+
+
+
+<script>
+// wait until the DOM before starting buttons
+document.addEventListener('DOMContentLoaded', bindButtons);
+
+function bindButtons(){
+
+    let buttonsSubmit = document.getElementsByClassName('submit');
+
+    for (let i = 0; i < buttonsSubmit.length; i++) {
+        buttonsSubmit[i].addEventListener('click', function(event){;
+            //console.log("adding ev to submit button");
+            var req = new XMLHttpRequest();
+            event.preventDefault();
+
+            let userPname = document.getElementById("pname").value;
+            //console.log("@@ userName:", userName);
+
+            let userAname = document.getElementById("aname").value;
+            //console.log("@@ userpurpose:", userpurpose);
+
+            req.open('GET', '/insert?table=program_author&pname=' + userPname + "&aname=" + userAname, true);
+            req.onload = function() {
+                let res = req.responseText;
+                //update();
+                location.reload();
+            }
+
+            event.preventDefault();
+            req.send(null);
+
+            
+        });
+    }
+
+        // hidden row id
+        let hiddenPid = document.getElementsByClassName("hiddenpid");
+        let hiddenAid = document.getElementsByClassName("hiddenaid");
+        console.log("hiddenaid: ", hiddenAid);
+
+
+        let buttonsDelete = document.getElementsByClassName("buttonDelete");
+
+console.log("length: " , buttonsDelete.length);
+        for (let i = 0; i < buttonsDelete.length; i++) {
+        console.log(buttonsDelete[i]);
+        buttonsDelete[i].addEventListener('click', function(event){;
+            console.log("adding ev to delete button");
+            event.preventDefault();
+            var req = new XMLHttpRequest();
+
+            console.log("/delete?table={{table}}&pid=" + hiddenPid[i].value + "&aid=" + hiddenAid[i].value);
+            req.open('GET', '/delete?table={{table}}&pid=' + hiddenPid[i].value + "&aid=" + hiddenAid[i].value , true);
+
+            req.onload = function() {
+                let res = req.responseText;
+                location.reload();
+            }
+
+            req.send(null);
+        });
+        };
+}
+
+
+            
+</script>
+
+<!--<script src="tabler.js"></script>-->
+
+
