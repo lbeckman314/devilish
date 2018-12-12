@@ -3,8 +3,8 @@ const https = require('https');
 const WebSocket = require('ws');
 
 const server = new https.createServer({
-  cert: fs.readFileSync('./cert.pem'),
-  key: fs.readFileSync('./key.pem'),
+  cert: fs.readFileSync('/etc/letsencrypt/live/liambeckman.com/cert.pem'),
+  key: fs.readFileSync('/etc/letsencrypt/live/liambeckman.com/privkey.pem'),
   passphrase: '284846'
 });
 
@@ -13,6 +13,7 @@ const wss = new WebSocket.Server({ server });
 console.log("Waiting for clients...");
 
 wss.on('connection', function connection(ws) {
+    console.log("Client connected!");
 
 	const { spawn } = require('child_process');
 	const options = {
@@ -21,6 +22,23 @@ wss.on('connection', function connection(ws) {
 	};
 
 	const child = spawn('bash', ['-c', './devilish'], options);
+
+    /*
+    switch(program) {
+        case "devilish":
+            const child = spawn('bash', ['-c', './devilish'], options);
+            break;
+        case "prime":
+            const child = spawn('bash', ['-c', './prime'], options);
+            break;
+        case "palindrome":
+            const child = spawn('bash', ['-c', './palindrome'], options);
+            break;
+        default:
+            console.log("Invalid program.");
+    }
+    */
+
 	child.unref();
 
 	//const child = spawn('./devilish');
@@ -41,6 +59,15 @@ wss.on('connection', function connection(ws) {
 			//res = ""
 		});
 
+		child.stderr.on('data', (data) => {
+			//console.log(`stdout: ${data}`);
+			//console.log("SENDING TO CLIENT:", data.toString());
+			//res += data.toString();
+			ws.send(data.toString());
+			//return res;
+			//res = ""
+		});
+
 
 		child.stderr.on('data', (data) => {
 			console.log(`stderr: ${data}`);
@@ -52,7 +79,7 @@ wss.on('connection', function connection(ws) {
 
 
 	ws.on('message', function incoming(message) {
-		console.log('received: %s', message);
+		//console.log('received: %s', message);
 
 		child.stdin.write(message + "\n");
 		//child.stdin.write("exit\n");
