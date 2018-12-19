@@ -20,3 +20,6 @@ cd $src
 git pull
 make
 mv $obj $demo
+
+cat .build.sh
+echo "demo: " $demo
