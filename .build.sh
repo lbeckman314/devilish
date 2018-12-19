@@ -1,13 +1,12 @@
 #!/bin/bash
-
-# https://support.cloudbees.com/hc/en-us/articles/203802500-Injecting-Secrets-into-Jenkins-Build-Jobs
 set +x
 
 project=devilish
 production=/var/www/pkgs/$project
 src=/var/www/pkgs/$project/src
+demo=/var/www/demo/prgrams/ 
+obj=devilish.out
 
-pwd
 #tar -zcvf $project.tar.gz $project
 git archive --format=tar -v -o $project.tar.gz HEAD
 #zip -r $project.zip $project
@@ -18,3 +17,5 @@ gpg --pinentry-mode loopback --passphrase $gpgpass --batch --yes --detach-sign -
 mv $project.tar.gz $project.zip sha256sums.txt* $production
 cd $src
 git pull
+make
+mv $obj $demo

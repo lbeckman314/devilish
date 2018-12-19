@@ -1,5 +1,5 @@
 devilish: devilish.c
-	gcc -o devilish devilish.c
+	gcc -o devilish.out devilish.c
 
 clean:
 	rm -f devilish
