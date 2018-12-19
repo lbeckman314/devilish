@@ -4,8 +4,6 @@ set +x
 project=devilish
 production=/var/www/pkgs/$project
 src=/var/www/pkgs/$project/src
-demo=/var/www/demo/programs/ 
-obj=devilish.out
 
 #tar -zcvf $project.tar.gz $project
 git archive --format=tar -v -o $project.tar.gz HEAD
@@ -18,8 +16,3 @@ gpg --pinentry-mode loopback --passphrase $gpgpass --batch --yes --detach-sign -
 mv $project.tar.gz $project.zip sha256sums.txt* $production
 cd $src
 git pull
-make
-mv $obj $demo
-
-cat .build.sh
-echo "demo: " $demo
