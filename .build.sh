@@ -4,7 +4,7 @@ set +x
 project=devilish
 production=/var/www/pkgs/$project
 src=/var/www/pkgs/$project/src
-demo=/var/www/demo/prgrams/ 
+demo=/var/www/demo/programs/ 
 obj=devilish.out
 
 #tar -zcvf $project.tar.gz $project
