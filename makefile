@@ -6,8 +6,7 @@ clean:
 
 test:
 	gcc -fprofile-arcs -ftest-coverage -o devilish.out devilish.c
-	./test.sh
-	gcov -b devilish.c
+	./test.sh && gcov -b devilish.c
 	coveralls --exclude lib --exclude tests --gcov-options '\-lp'
 
 uninstall:
