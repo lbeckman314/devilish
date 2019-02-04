@@ -16,3 +16,5 @@ gpg --pinentry-mode loopback --passphrase $gpgpass --batch --yes --detach-sign -
 mv $project.tar.gz $project.zip sha256sums.txt* $production
 cd $src
 git pull
+
+make test
