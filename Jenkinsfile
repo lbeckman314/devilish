@@ -6,8 +6,8 @@ node {
       sh "make test"
    }
    stage('Compress') {
-      sh "git archive --format=tar -v -o $project.tar.gz HEAD"
-      sh "git archive --format=zip -v -o $project.zip HEAD"
+      sh "git archive --format=tar -v -o ${PROJECT}.tar.gz HEAD"
+      sh "git archive --format=zip -v -o ${PROJECT}.zip HEAD"
    }
    stage('Sign') {
       sh "> sha256sums.txt"
