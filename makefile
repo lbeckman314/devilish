@@ -5,7 +5,6 @@ clean:
 	rm -f devilish
 
 test:
-	command -v coveralls >/dev/null 2>&1 || pip3 install --user cpp-coveralls
 	gcc -fprofile-arcs -ftest-coverage -o devilish.out devilish.c
 	./test.sh; gcov -b devilish.c
 	coveralls --exclude lib --exclude tests --gcov-options '\-lp'
