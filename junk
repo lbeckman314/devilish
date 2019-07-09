@@ -1,0 +1,12 @@
+LICENSE
+README.md
+compile_commands.json
+devilish.c
+devilish.c.gcov
+devilish.gcda
+devilish.gcno
+devilish.out
+junk
+junk2
+makefile
+test.sh

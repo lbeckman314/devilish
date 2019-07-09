@@ -1,0 +1,13 @@
+[
+    {
+        "arguments": [
+            "gcc", 
+            "-c", 
+            "-o", 
+            "devilish.out", 
+            "devilish.c"
+        ], 
+        "directory": "/home/liam/Documents/code/projects/devilish", 
+        "file": "devilish.c"
+    }
+]

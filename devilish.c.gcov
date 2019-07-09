@@ -1,0 +1,788 @@
+        -:    0:Source:devilish.c
+        -:    0:Graph:devilish.gcno
+        -:    0:Data:devilish.gcda
+        -:    0:Runs:1
+        -:    0:Programs:1
+        -:    1:/* liam beckman */
+        -:    2:/* 18 may 2018 */
+        -:    3:/* cs344: progream 3 */
+        -:    4:/* https://www.w3resource.com/c-programming-exercises/string/c-string-exercise-31.php */
+        -:    5:/* https://github.com/angrave/SystemProgramming/wiki/Forking,-Part-2:-Fork,-Exec,-Wait */
+        -:    6:/* https://stackoverflow.com/questions/2595503/determine-pid-of-terminated-process */
+        -:    7:/* https://stackoverflow.com/questions/190229/where-is-the-itoa-function-in-linux */
+        -:    8:/* https://www.geeksforgeeks.org/strtok-strtok_r-functions-c-examples/ */
+        -:    9:/* https://www.poetryfoundation.org/poems/51021/the-sea-shell */
+        -:   10:
+        -:   11:/* define sigaction structs */
+        -:   12:#define _XOPEN_SOURCE
+        -:   13:
+        -:   14:/* getline */
+        -:   15:#define _GNU_SOURCE
+        -:   16:
+        -:   17:/* file writing and reading */
+        -:   18:#include <fcntl.h>
+        -:   19:/* signals */
+        -:   20:#include <signal.h>
+        -:   21:#include <stdio.h>
+        -:   22:#include <stdlib.h>
+        -:   23:#include <sys/types.h>
+        -:   24:/* waitpid() */
+        -:   25:#include <sys/wait.h>
+        -:   26:/* process id's */
+        -:   27:#include <unistd.h>
+        -:   28:#include <string.h>
+        -:   29:
+        -:   30:/* Your shell must support command lines with a maximum length of 2048 characters, and a maximum of 512 arguments. */
+        -:   31:#define MAX_ARG 512
+        -:   32:#define MAX_CHAR 2048
+        -:   33:
+        -:   34:
+        -:   35:/* function prototypes */
+        -:   36:void path(char **args, int argCount);
+        -:   37:void execute(char** args, int argCount, int pidShell);
+        -:   38:void input(char* infile);
+        -:   39:void output(char* outfile);
+        -:   40:char* dollarToPid(char* args, int pidShell);
+        -:   41:
+        -:   42:void catchSIGTSTP(int signo);
+        -:   43:void catchSIGCHLD(int signo);
+        -:   44:
+        -:   45:int getFgOnly();
+        -:   46:void setFgOnly(int newValue);
+        -:   47:
+        -:   48:int getBgStatus();
+        -:   49:void setBgStatus(int newValue);
+        -:   50:
+        -:   51:int getWrite();
+        -:   52:void setWrite(char* newString);
+        -:   53:
+        -:   54:/* global variables */
+        -:   55:/* all commands will be in foreground */
+        -:   56:int fgOnly = 0;
+        -:   57:
+        -:   58:/* command will run in background */
+        -:   59:int bgStatus = 0;
+        -:   60:
+        -:   61:/* status of background processes before prompt */
+        -:   62:char writeBuffer[MAX_CHAR];
+        -:   63:
+        -:   64:/* status of background processes before prompt */
+        -:   65:char statusBuffer[MAX_CHAR];
+        -:   66:
+        -:   67:
+        -:   68:
+function main called 1 returned 0% blocks executed 92%
+        1:   69:int main(int argc, char* argv[])
+        -:   70:{
+        -:   71:    /* SIGTSTP: ctrl z */
+        1:   72:    struct sigaction SIGTSTP_action = {0};
+        1:   73:    SIGTSTP_action.sa_handler = catchSIGTSTP;
+        1:   74:    sigfillset(&SIGTSTP_action.sa_mask);
+call    0 returned 100%
+        1:   75:    SIGTSTP_action.sa_flags = 0;
+        -:   76:
+        1:   77:    sigaction(SIGTSTP, &SIGTSTP_action, NULL);
+call    0 returned 100%
+        -:   78:
+        -:   79:    /* ignore SIGINT     */
+        1:   80:    struct sigaction ignore_action = {0};
+        1:   81:    ignore_action.sa_handler = SIG_IGN;
+        1:   82:    sigaction(SIGINT, &ignore_action, NULL);
+call    0 returned 100%
+        -:   83:
+        1:   84:    int numCharsEntered = -5;
+        1:   85:    size_t bufferSize = 0;
+        1:   86:    char* lineEntered = NULL;
+        -:   87:
+        1:   88:    memset(writeBuffer, '\0', sizeof(writeBuffer));
+        -:   89:
+        -:   90:    while (1)
+      101:   91:    {
+        -:   92:        /* if there are messages in the global write buffer */
+        -:   93:        /* output status of background process */
+      102:   94:        printf("%s", writeBuffer);
+call    0 returned 100%
+      102:   95:        fflush(stdout);
+call    0 returned 100%
+        -:   96:
+        -:   97:        /* reset writeBuffer */
+      102:   98:        writeBuffer[0] = '\0';
+        -:   99:
+        -:  100:        while (1)
+        -:  101:        {
+        -:  102:
+     102*:  103:            if (getWrite() == 0)
+call    0 returned 100%
+branch  1 taken 100% (fallthrough)
+branch  2 taken 0%
+        -:  104:            {
+        -:  105:                /* prompt symbol */
+      102:  106:                printf(":");
+call    0 returned 100%
+      102:  107:                fflush(stdout);
+call    0 returned 100%
+        -:  108:            }
+        -:  109:
+      102:  110:            numCharsEntered = getline(&lineEntered, &bufferSize, stdin);
+call    0 returned 100%
+      102:  111:            if (numCharsEntered == -1)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  112:            {
+    #####:  113:                clearerr(stdin);
+call    0 never executed
+        -:  114:            }
+        -:  115:
+        -:  116:            else
+        -:  117:            {
+      102:  118:                break;
+        -:  119:            }
+        -:  120:        }
+        -:  121:
+        -:  122:        /* Your shell must support command lines with a maximum length of 2048 characters, and a maximum of 512 arguments. */
+        -:  123:        char inputString[MAX_ARG][MAX_CHAR];
+        -:  124:
+        -:  125:        int m;
+    52326:  126:        for (m = 0; m < MAX_ARG; m++)
+branch  0 taken 99%
+branch  1 taken 1% (fallthrough)
+        -:  127:        {
+    52224:  128:            memset(inputString[m], '\0', strlen(inputString[m]));
+        -:  129:        }
+        -:  130:
+      102:  131:        int j = 0;
+      102:  132:        int count = 0;
+        -:  133:        char *args[MAX_ARG];
+        -:  134:
+        -:  135:        /* remove new line from end of input */
+      102:  136:        lineEntered[strcspn(lineEntered, "\n")] = '\0';
+        -:  137:
+        -:  138:        /* break input into individual words in inputString array */
+        -:  139:        int i;
+     2175:  140:        for (i = 0; i <= (strlen(lineEntered)); i++)
+branch  0 taken 95%
+branch  1 taken 5% (fallthrough)
+        -:  141:        {
+     2073:  142:            if (lineEntered[i] == ' ' || lineEntered[i] == '\0')
+branch  0 taken 89% (fallthrough)
+branch  1 taken 11%
+branch  2 taken 6% (fallthrough)
+branch  3 taken 94%
+        -:  143:            {
+      332:  144:                inputString[count][j] = '\0';
+      332:  145:                args[count] = inputString[count];
+        -:  146:                /*printf("args[count]: %s\n", args[count]); */
+      332:  147:                count += 1;
+      332:  148:                j = 0;
+        -:  149:            }
+        -:  150:            else
+        -:  151:            {
+     1741:  152:                inputString[count][j] = lineEntered[i];
+     1741:  153:                j += 1;
+        -:  154:            }
+        -:  155:        }
+        -:  156:
+        -:  157:
+        -:  158:        /* exit command () */
+      102:  159:        if (strcmp(inputString[0], "exit") == 0)
+branch  0 taken 1% (fallthrough)
+branch  1 taken 99%
+        -:  160:        {
+        -:  161:            /* kill all ongoing child processes */
+        -:  162:            pid_t pid;
+        -:  163:            int childExitStatus;
+       11:  164:            while ((pid = waitpid(-1, &childExitStatus, WNOHANG)) != -1)
+call    0 returned 100%
+branch  1 taken 91%
+branch  2 taken 9% (fallthrough)
+        -:  165:            {
+       10:  166:                kill(pid, SIGINT);
+call    0 returned 100%
+        -:  167:            }
+        -:  168:
+        -:  169:            /* exit program */
+        1:  170:            exit(0);
+call    0 returned 0%
+        -:  171:        }
+        -:  172:
+        -:  173:        /* cd command (change directory, defaults to user's home directory with no arguments) */
+        -:  174:        char *directory;
+      101:  175:        if (strcmp(inputString[0], "cd") == 0)
+branch  0 taken 2% (fallthrough)
+branch  1 taken 98%
+        -:  176:        {
+        -:  177:            /* if no directory was specified */
+        2:  178:            if (inputString[1][0] == '\0')
+branch  0 taken 50% (fallthrough)
+branch  1 taken 50%
+        -:  179:            {
+        -:  180:                /* change to the user's home directory */
+        1:  181:                directory = getenv("HOME");
+call    0 returned 100%
+        -:  182:            }
+        -:  183:
+        -:  184:            /* else a directory was specified */
+        -:  185:            else
+        -:  186:            {
+        -:  187:                /* so change to that directory */
+        1:  188:                directory = inputString[1];
+        -:  189:
+        -:  190:                /* replace $$ with pid of current process */
+        1:  191:                if (strstr(directory, "$$") != 0)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  192:                {
+        -:  193:                    /* get the pid of the shell */
+        1:  194:                    int pidShell = getpid();
+call    0 returned 100%
+        -:  195:
+        1:  196:                    directory = dollarToPid(directory, pidShell);
+call    0 returned 100%
+        -:  197:                }
+        -:  198:
+        -:  199:                char prefix[3];
+        1:  200:                memset(prefix, '\0', strlen(prefix));
+        -:  201:
+        1:  202:                strcpy(prefix, "./");
+        1:  203:                strcat(prefix, directory);
+        -:  204:
+        -:  205:            }
+        -:  206:
+        2:  207:            if (chdir(directory) != 0)
+call    0 returned 100%
+branch  1 taken 0% (fallthrough)
+branch  2 taken 100%
+        -:  208:            {
+    #####:  209:                perror("chdir error");
+call    0 never executed
+        -:  210:            }
+        -:  211:        }
+        -:  212:
+        -:  213:        /* status command () */
+       99:  214:        else if (strcmp(inputString[0], "status") == 0)
+branch  0 taken 1% (fallthrough)
+branch  1 taken 99%
+        -:  215:        {
+        -:  216:            /* exit status of last foreground command */
+        1:  217:            printf(statusBuffer);
+call    0 returned 100%
+        -:  218:        }
+        -:  219:
+        -:  220:        /* ignore comment lines or blank lines */
+       98:  221:        else if (strcmp(inputString[0], "#") == 0 ||
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+       98:  222:                 strcmp(inputString[0], "\0") == 0)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  223:        {
+    #####:  224:            continue;
+        -:  225:        }
+        -:  226:
+        -:  227:        /* command not built in, parse user's path */
+        -:  228:        else
+        -:  229:        {
+       98:  230:            path(args, count);
+call    0 returned 100%
+        -:  231:        }
+        -:  232:
+        -:  233:        /* free lineEntered pointer */
+      101:  234:        free(lineEntered);
+      101:  235:        lineEntered = NULL;
+        -:  236:    }
+        -:  237:}
+        -:  238:
+        -:  239:
+        -:  240:/* stdout redirection ">" */
+function output called 2 returned 100% blocks executed 60%
+        2:  241:void output(char* outfile)
+        -:  242:{
+        -:  243:    /* open output file for writing */
+        -:  244:    /*printf("outfile: %s\n", outfile); */
+        2:  245:    int targetFD = open(outfile, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+call    0 returned 100%
+        2:  246:    if (targetFD == -1)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  247:    {
+    #####:  248:        perror("open() error");
+call    0 never executed
+    #####:  249:        exit(1);
+call    0 never executed
+        -:  250:    }
+        -:  251:
+        -:  252:    /* redirect stdout to the output file */
+        2:  253:    int result = dup2(targetFD, 1);
+call    0 returned 100%
+        2:  254:    if (result == -1)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  255:    {
+    #####:  256:        perror("dup2 error");
+call    0 never executed
+    #####:  257:        exit(1);
+call    0 never executed
+        -:  258:    }
+        -:  259:
+        2:  260:    close(targetFD);
+call    0 returned 100%
+        2:  261:}
+        -:  262:
+        -:  263:
+        -:  264:/* stdin redirection "<" */
+function input called 3 returned 67% blocks executed 82%
+        3:  265:void input(char* infile)
+        -:  266:{
+        -:  267:    /* open input file for reading */
+        3:  268:    int targetFD = open(infile, O_RDONLY);
+call    0 returned 100%
+        -:  269:
+        -:  270:    /* close on exec */
+        3:  271:    fcntl(targetFD, F_SETFD, FD_CLOEXEC);
+call    0 returned 100%
+        3:  272:    if (targetFD == -1)
+branch  0 taken 33% (fallthrough)
+branch  1 taken 67%
+        -:  273:    {
+        1:  274:        perror("open() error");
+call    0 returned 100%
+        1:  275:        exit(1);
+call    0 returned 0%
+        -:  276:    }
+        -:  277:
+        -:  278:    /* redirect stdin to the input file */
+        2:  279:    int result = dup2(targetFD, 0);
+call    0 returned 100%
+        2:  280:    if (result == -1)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  281:    {
+    #####:  282:        perror("dup2 error");
+call    0 never executed
+    #####:  283:        exit(1);
+call    0 never executed
+        -:  284:    }
+        -:  285:
+        2:  286:    close(targetFD);
+call    0 returned 100%
+        2:  287:}
+        -:  288:
+        -:  289:
+function execute called 98 returned 97% blocks executed 100%
+       98:  290:void execute(char** args, int argCount, int pidShell)
+       98:  291:{
+       98:  292:    char *myargs[argCount + 1];
+       98:  293:    memset(myargs, '\0', sizeof(myargs));
+       98:  294:    int execArgs = 0;
+       98:  295:    int redirected = 0;
+        -:  296:
+        -:  297:    /* default SIGINT action */
+       98:  298:    struct sigaction SIGINT_action = {0};
+       98:  299:    SIGINT_action.sa_handler = SIG_DFL;
+       98:  300:    sigaction(SIGINT, &SIGINT_action, NULL);
+call    0 returned 100%
+        -:  301:
+        -:  302:    /*printf("execute argCount: %d\n", argCount); */
+        -:  303:    int k;
+      422:  304:    for (k = 0; k < argCount; k++)
+branch  0 taken 77%
+branch  1 taken 23% (fallthrough)
+        -:  305:    {
+        -:  306:        /*printf("args[%d]: %s\n", k, args[k]); */
+      325:  307:        if (strcmp(args[k], ">") == 0)
+branch  0 taken 1% (fallthrough)
+branch  1 taken 99%
+        -:  308:        {
+        2:  309:            output(args[k + 1]);
+call    0 returned 100%
+        2:  310:            redirected = 1;
+        -:  311:        }
+        -:  312:
+      323:  313:        else if (strcmp(args[k], "<") == 0)
+branch  0 taken 1% (fallthrough)
+branch  1 taken 99%
+        -:  314:        {
+        3:  315:            input(args[k + 1]);
+call    0 returned 67%
+        2:  316:            redirected = 1;
+        -:  317:        }
+        -:  318:
+        -:  319:        /* don't try to exec with ampersand */
+      320:  320:        else if (strcmp(args[k], "&") == 0)
+branch  0 taken 1% (fallthrough)
+branch  1 taken 99%
+        -:  321:        {
+        4:  322:            continue;
+        -:  323:        }
+        -:  324:
+      316:  325:        else if (!redirected)
+branch  0 taken 99% (fallthrough)
+branch  1 taken 1%
+        -:  326:        {
+        -:  327:            /* replace $$ with pid of current process */
+      312:  328:            if (strstr(args[k], "$$") != 0)
+branch  0 taken 2% (fallthrough)
+branch  1 taken 98%
+        -:  329:            {
+        5:  330:                args[k] = dollarToPid(args[k], pidShell);
+call    0 returned 100%
+        -:  331:            }
+        -:  332:
+        -:  333:            /* add arguments to array that will be passed to execvp(). */
+        -:  334:            /*printf("adding %s to myargs\n", args[k]); */
+      312:  335:            myargs[execArgs] = args[k];
+      312:  336:            execArgs += 1;
+        -:  337:        }
+        -:  338:
+        -:  339:    }
+        -:  340:
+       97:  341:    myargs[argCount] = NULL;
+        -:  342:
+        -:  343:     /* If a command fails because the shell could not find the command to run, then the shell will print an error message and set the exit status to 1. */
+       97:  344:    if (execvp(*myargs, myargs) != 0)
+branch  0 taken 2% (fallthrough)
+branch  1 taken 98%
+        -:  345:    {
+        2:  346:        perror("exec() error");
+call    0 returned 100%
+        2:  347:        exit(2);
+call    0 returned 0%
+        -:  348:    }
+       95:  349:}
+        -:  350:
+        -:  351:
+        -:  352:/* change "$$" to pid of shell */
+function dollarToPid called 6 returned 100% blocks executed 86%
+        6:  353:char* dollarToPid(char* args, int pidShell)
+        -:  354:{
+        -:  355:    /* all characters before $$ */
+        6:  356:    char* prefix = strchr(args, '$');
+        -:  357:
+        -:  358:    /* all characters following $$ */
+        6:  359:    char* token = strtok(prefix, "$");
+call    0 returned 100%
+        6:  360:    char* suffix = (char *) malloc((sizeof(token)+ 1) * sizeof(char));
+        -:  361:
+        -:  362:    /* if there are characters following $$, */
+        -:  363:    /* make a copy in the suffix variable */
+        6:  364:    if (token != NULL)
+branch  0 taken 0% (fallthrough)
+branch  1 taken 100%
+        -:  365:    {
+    #####:  366:        strcpy(suffix, token);
+        -:  367:    }
+        -:  368:
+        -:  369:    /* change $$ to pid of shell */
+        -:  370:    /* sprintf is standard, could also use */
+        -:  371:    /* itoa(getpid()) here */
+        6:  372:    sprintf(prefix, "%d", pidShell);
+        -:  373:
+        -:  374:    /* if there were characters following $$ in the original */
+        -:  375:    /* string, append them to the final pid string */
+        6:  376:    if (suffix != NULL)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  377:    {
+        6:  378:        strcat(prefix, suffix);
+        -:  379:    }
+        -:  380:    /*printf("$$ :: %s\n", prefix); */
+        -:  381:
+        -:  382:    /* TODO maybe not necessary */
+        6:  383:    free(suffix);
+        -:  384:
+        6:  385:    return args;
+        -:  386:}
+        -:  387:
+        -:  388:
+function path called 98 returned 100% blocks executed 81%
+       98:  389:void path(char **args, int argCount)
+        -:  390:{
+       98:  391:    pid_t spawnPid = -5;
+       98:  392:    int pidShell = getpid();
+call    0 returned 100%
+        -:  393:
+        -:  394:    /* set to background if last character is & */
+       98:  395:    if (strcmp(args[argCount - 1], "&") == 0 && getFgOnly() == 0)
+branch  0 taken 3% (fallthrough)
+branch  1 taken 97%
+call    2 returned 100%
+branch  3 taken 67% (fallthrough)
+branch  4 taken 33%
+        -:  396:    {
+        -:  397:        /*setFgOnly(0); */
+        -:  398:        /*printf("setting to bg\n"); */
+        2:  399:        setBgStatus(1);
+call    0 returned 100%
+        -:  400:    }
+        -:  401:
+        -:  402:    /* otherwise make sure process runs in foreground */
+        -:  403:    else
+        -:  404:    {
+        -:  405:        /*printf("setting to fg\n"); */
+       96:  406:        setBgStatus(0);
+call    0 returned 100%
+        -:  407:    }
+        -:  408:
+        -:  409:
+        -:  410:    /* register signal handler if command is in background */
+        -:  411:    /* and register before child can complete */
+       98:  412:    if (getBgStatus() == 1)
+call    0 returned 100%
+branch  1 taken 2% (fallthrough)
+branch  2 taken 98%
+        -:  413:    {
+        2:  414:        struct sigaction SIGCHLD_action = {0};
+        -:  415:
+        2:  416:        SIGCHLD_action.sa_handler = catchSIGCHLD;
+        2:  417:        sigfillset(&SIGCHLD_action.sa_mask);
+call    0 returned 100%
+        2:  418:        SIGCHLD_action.sa_flags = 0;
+        2:  419:        sigaction(SIGCHLD, &SIGCHLD_action, NULL);
+call    0 returned 100%
+        -:  420:    }
+        -:  421:
+        -:  422:    /* fork child process */
+       98:  423:    spawnPid = fork();
+call    0 returned NAN %
+      196:  424:    switch (spawnPid)
+branch  0 taken 0%
+branch  1 taken 50%
+branch  2 taken 50%
+        -:  425:    {
+        -:  426:        /* error in forking child process */
+    #####:  427:        case -1:
+    #####:  428:            perror("fork() error\n");
+call    0 never executed
+    #####:  429:            exit(1);
+call    0 never executed
+        -:  430:            break;
+        -:  431:
+        -:  432:        /* child process */
+       98:  433:        case 0:
+       98:  434:            execute(args, argCount, pidShell);
+call    0 returned 0%
+    #####:  435:            break;
+        -:  436:
+        -:  437:        /* parent process */
+       98:  438:        default:
+        -:  439:        {
+        -:  440:            int childExitStatus;
+        -:  441:
+        -:  442:            /* if the process is running in the foreground */
+       98:  443:            if (getBgStatus() == 0)
+call    0 returned 100%
+branch  1 taken 98% (fallthrough)
+branch  2 taken 2%
+        -:  444:            {
+        -:  445:                /* block until the process is done */
+       96:  446:                if (waitpid(spawnPid, &childExitStatus, 0) > 0)
+call    0 returned 100%
+branch  1 taken 97% (fallthrough)
+branch  2 taken 3%
+        -:  447:                {
+        -:  448:
+        -:  449:                    /* processes exited */
+       93:  450:                    if (WIFEXITED(childExitStatus) != 0)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  451:                    {
+       93:  452:                            int exitStatus = WEXITSTATUS(childExitStatus);
+        -:  453:
+        -:  454:                            /* write exit status to status buffer (for "status" command) */
+       93:  455:                            sprintf(statusBuffer, "exit value %d\n", exitStatus);
+        -:  456:                    }
+        -:  457:
+        -:  458:                    /* process terminated by signal */
+    #####:  459:                    else if (WIFSIGNALED(childExitStatus) != 0)
+branch  0 never executed
+branch  1 never executed
+        -:  460:                    {
+    #####:  461:                        int termSignal = WTERMSIG(childExitStatus);
+        -:  462:                        if (termSignal == 123)
+        -:  463:                        {
+        -:  464:                            /*termSignal = 2; */
+        -:  465:                        }
+        -:  466:
+        -:  467:                        /* write signal to status buffer (for "status" command) */
+    #####:  468:                        sprintf(statusBuffer, "terminated by signal %d\n", termSignal);
+    #####:  469:                        sprintf(writeBuffer, "terminated by signal %d\n", termSignal);
+        -:  470:                        /*char message[512]; */
+        -:  471:                        /*sprintf(message, "terminated by signal %d\n", termSignal); */
+        -:  472:                        /*write(STDOUT_FILENO, message, 36); */
+        -:  473:                        /*fflush(stdout); */
+        -:  474:                    }
+        -:  475:                }
+        -:  476:            }
+        -:  477:
+        -:  478:            /* if the process is running in the background */
+       98:  479:            if (getBgStatus() == 1)
+call    0 returned 100%
+branch  1 taken 2% (fallthrough)
+branch  2 taken 98%
+        -:  480:            {
+        2:  481:                sprintf(writeBuffer, "background pid is %d\n", spawnPid);
+        -:  482:                /* do not block, just run in background */
+        2:  483:                waitpid(-1, &childExitStatus, WNOHANG);
+call    0 returned 100%
+        -:  484:            }
+        -:  485:
+        -:  486:
+       98:  487:            break;
+        -:  488:        }
+        -:  489:    }
+       98:  490:}
+        -:  491:
+        -:  492:
+        -:  493:/* For our purposes, note that the printf() family of functions is NOT re-entrant. In your signal handlers, when outputting text, you must use other output functions! */
+        -:  494:
+function catchSIGTSTP called 2 returned 100% blocks executed 100%
+        2:  495:void catchSIGTSTP(int signo)
+        -:  496:{
+        2:  497:    if (getFgOnly() == 0)
+call    0 returned 100%
+branch  1 taken 50% (fallthrough)
+branch  2 taken 50%
+        -:  498:    {
+        -:  499:        /*char *message = "Entering foreground-only mode (& is now ignored)\n"; */
+        -:  500:        /*write(STDOUT_FILENO, message, 81); */
+        1:  501:        char *message = "\nEntering foreground-only mode (& is now ignored)\n";
+        1:  502:        write(STDOUT_FILENO, message, 51);
+call    0 returned 100%
+        1:  503:        fflush(stdout);
+call    0 returned 100%
+        1:  504:        setFgOnly(1);
+call    0 returned 100%
+        -:  505:    }
+        -:  506:
+        -:  507:    else
+        -:  508:    {
+        -:  509:        /*char *message = "Exiting foreground-only mode\n"; */
+        -:  510:        /*write(STDOUT_FILENO, message, 38); */
+        1:  511:        char *message = "\nExiting foreground-only mode\n";
+        1:  512:        write(STDOUT_FILENO, message, 31);
+call    0 returned 100%
+        1:  513:        fflush(stdout);
+call    0 returned 100%
+        1:  514:        setFgOnly(0);
+call    0 returned 100%
+        -:  515:    }
+        2:  516:}
+        -:  517:
+function catchSIGCHLD called 47 returned 100% blocks executed 100%
+       47:  518:void catchSIGCHLD(int signo)
+        -:  519:{
+        -:  520:    /*printf("SIGCHLD recieved :: bgStatus -> %d\n", bgStatus); */
+        -:  521:    pid_t spawnPid;
+        -:  522:    int childExitStatus;
+       47:  523:    spawnPid = waitpid(-1, &childExitStatus, WNOHANG);
+call    0 returned 100%
+        -:  524:
+        -:  525:    /*if the pid is not from a background process, output info */
+       47:  526:    if (spawnPid > 0)
+branch  0 taken 9% (fallthrough)
+branch  1 taken 91%
+        -:  527:    {
+        4:  528:        sprintf(writeBuffer, "background pid %d is done: ", spawnPid);
+        -:  529:
+        4:  530:        if (WIFEXITED(childExitStatus) != 0)
+branch  0 taken 75% (fallthrough)
+branch  1 taken 25%
+        -:  531:        {
+        3:  532:            int exitStatus = WEXITSTATUS(childExitStatus);
+        -:  533:
+        3:  534:            sprintf(writeBuffer + strlen(writeBuffer), "exit value %d\n", exitStatus);
+        -:  535:        }
+        -:  536:
+        1:  537:        else if (WIFSIGNALED(childExitStatus) != 0)
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  538:        {
+        1:  539:            int termSignal = WTERMSIG(childExitStatus);
+        -:  540:
+        1:  541:            sprintf(writeBuffer + strlen(writeBuffer), "terminated by signal %d\n", termSignal);
+        -:  542:
+        -:  543:        }
+        -:  544:    }
+        -:  545:
+        -:  546:    /*setWrite(writeBuffer); */
+       47:  547:}
+        -:  548:
+function getWrite called 102 returned 100% blocks executed 75%
+      102:  549:int getWrite()
+        -:  550:{
+        -:  551:    /* if writeBuffer is empty, return 0 */
+      102:  552:    if(writeBuffer[0] == '\0')
+branch  0 taken 100% (fallthrough)
+branch  1 taken 0%
+        -:  553:    {
+      102:  554:        return 0;
+        -:  555:    }
+        -:  556:
+        -:  557:    /* else if writeBuffer has contents, return 1 */
+    #####:  558:    return 1;
+        -:  559:}
+        -:  560:
+function setWrite called 0 returned 0% blocks executed 0%
+    #####:  561:void setWrite(char* newString)
+        -:  562:{
+    #####:  563:    strcat(writeBuffer, newString);
+    #####:  564:}
+        -:  565:
+function getFgOnly called 5 returned 100% blocks executed 100%
+        5:  566:int getFgOnly()
+        -:  567:{
+        5:  568:    return fgOnly;
+        -:  569:}
+        -:  570:
+function setFgOnly called 2 returned 100% blocks executed 100%
+        2:  571:void setFgOnly(int newValue)
+        -:  572:{
+        2:  573:fgOnly = newValue;
+        2:  574:}
+        -:  575:
+function getBgStatus called 294 returned 100% blocks executed 100%
+      294:  576:int getBgStatus()
+        -:  577:{
+      294:  578:return bgStatus;
+        -:  579:}
+        -:  580:
+function setBgStatus called 98 returned 100% blocks executed 100%
+       98:  581:void setBgStatus(int newValue)
+        -:  582:{
+       98:  583:bgStatus = newValue;
+       98:  584:}
+        -:  585:
+        -:  586:
+        -:  587:/*
+        -:  588:~ * ~ * ~ * ~ * ~ * ~ * ~ * ~
+        -:  589:
+        -:  590:The Sea Shell
+        -:  591:By Marin Sorescu
+        -:  592:Translated by Michael Hamburger
+        -:  593:
+        -:  594:~ * ~ * ~ * ~ * ~ * ~ * ~ * ~
+        -:  595:
+        -:  596:I have hidden inside a sea shell
+        -:  597:but forgotten in which.
+        -:  598:
+        -:  599:Now daily I dive,
+        -:  600:filtering the sea through my fingers,
+        -:  601:to find myself.
+        -:  602:Sometimes I think
+        -:  603:a giant fish has swallowed me.
+        -:  604:Looking for it everywhere I want to make sure
+        -:  605:it will get me completely.
+        -:  606:
+        -:  607:The sea-bed attracts me, and
+        -:  608:I'm repelled by millions
+        -:  609:of sea shells that all look alike.
+        -:  610:Help, I am one of them.
+        -:  611:If only I knew, which.
+        -:  612:
+        -:  613:How often I've gone straight up
+        -:  614:to one of them, saying: That’s me.
+        -:  615:Only, when I prised it open
+        -:  616:it was empty.
+        -:  617:
+        -:  618:~ * ~ * ~ * ~ * ~ * ~ * ~ * ~
+        -:  619:*/
