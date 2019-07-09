@@ -2,9 +2,6 @@ PROJECT = "devilish"
 PRODUCTION = "/var/www/pkgs/${PROJECT}"
 
 node {
-   stage('Update') {
-      git url: 'https://git.liambeckman.com/cgit/devilish/'
-   }
    stage('Test') {
       sh "make test"
    }
